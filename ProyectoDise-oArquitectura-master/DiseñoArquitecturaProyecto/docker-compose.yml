@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - transaction-network
+
+  web:
+    build: .
+    container_name: transaction_queue_app
+    ports:
+      - "5000:80"
+    depends_on:
+      - redis
+    networks:
+      - transaction-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:DefaultConnection=Server=CASAALEX;Database=Proyect;Trusted_Connection=True;MultipleActiveResultSets=true
+      - Redis__ConnectionString=redis:6379 # Usando el nombre del contenedor de Redis
+
+networks:
+  transaction-network:
+    driver: bridge
